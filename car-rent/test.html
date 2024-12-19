@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Car Listing</title>
+    <style>
+        /* Basic Styling - Expand this for a better look */
+        body {
+            font-family: sans-serif;
+        }
+
+        .item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .item img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .appended-box {
+            display: none;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .appended-box.show {
+            display: block;
+        }
+
+        .select-menu {
+            margin-right: 20px;
+            position: relative;
+        }
+
+        .select-menu ul {
+            list-style: none;
+            padding: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            display: none;
+            z-index: 1;
+        }
+
+        .select-menu.active-drop ul {
+            display: block;
+        }
+
+        .select-menu li {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .select-menu li.selected {
+            background-color: #f0f0f0;
+        }
+
+        .select-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        .highlighted {
+            background-color: lightblue;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="option-box first">
+        <label class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <div class="input">
+                    <input type="radio" name="mileage-option" checked>
+                </div>
+                <div>
+                    <h6>1,200</h6>
+                    <p>+ksh0.35 / for every additional km</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-1">
+                <span class="small">Include</span>
+            </div>
+        </label>
+    </div>
+
+    <div class="option-box last">
+        <label class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <div class="input">
+                    <input type="radio" name="mileage-option" checked>
+                </div>
+                <div>
+                    <h6>Unlimited kilometers</h6>
+                    <p>All kilometers are included in the price</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-1">
+                <span class="small"><span>${car.price.currency}</span>${car.price.amount}</span>
+                <span class="small">/</span>
+                <span class="small">day</span>
+            </div>
+        </label>
+    </div>
+
+    <div class="d-flex g-5 drop">
+        <div class="select-menu sort">
+            <div class="select-btn">
+                <span class="sBtn-text">Sort by</span>
+                <i class="fa fa-angle-down" aria-hidden="true"></i>
+            </div>
+            <ul class="options">
+                <li class="option">
+                    <span class="option-text">Price low to high</span>
+                </li>
+                <li class="option">
+                    <span class="option-text">Price high to low</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="select-menu">
+            <div class="select-btn">
+                <span class="sBtn-text">Vehicle type</span>
+                <i class="fa fa-angle-down" aria-hidden="true"></i>
+            </div>
+            <ul class="options">
+                <li class="option">
+                    <span class="option-text">sedan</span>
+                </li>
+                <li class="option">
+                    <span class="option-text">suv</span>
+                </li>
+                <li class="option">
+                    <span class="option-text">convertible</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="select-menu">
+            <div class="select-btn">
+                <span class="sBtn-text">Gearshift</span>
+                <i class="fa fa-angle-down" aria-hidden="true"></i>
+            </div>
+            <ul class="options">
+                <li class="option">
+                    <span class="option-text">automatic</span>
+                </li>
+                <li class="option">
+                    <span class="option-text">manual</span>
+                </li>
+            </ul>
+        </div>
+        <div class="select-menu">
+            <div class="select-btn">
+                <span class="sBtn-text">Passengers</span>
+                <i class="fa fa-angle-down" aria-hidden="true"></i>
+            </div>
+            <ul class="options">
+                <li class="option">
+                    <span class="option-text">2+</span>
+                </li>
+                <li class="option">
+                    <span class="option-text">4+</span>
+                </li>
+                <li class="option">
+                    <span class="option-text">5+</span>
+                </li>
+                <li class="option">
+                    <span class="option-text">7+</span>
+                </li>
+            </ul>
+        </div>
+        <div class="select-menu">
+            <div class="select-btn">
+                <span class="sBtn-text">Driver's age</span>
+                <i class="fa fa-angle-down" aria-hidden="true"></i>
+            </div>
+            <ul class="options">
+                <li class="option">
+                    <span class="option-text">18+</span>
+                </li>
+                <li class="option">
+                    <span class="option-text">21+</span>
+                </li>
+                <li class="option">
+                    <span class="option-text">25+</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="itemContainer" class="row"></div>
+
+    <script>
+        const carData = [
+            // ...Your car data...
+        ];
+
+        const itemContainer = document.getElementById('itemContainer');
+
+        function createCarCard(car, index) {
+            const carItem = document.createElement('div');
+            carItem.className = 'item';
+            carItem.dataset.index = index; //Set data-index attribute
+            carItem.innerHTML = `
+        <img src="${car.carImg}" alt="${car.carName}">
+        <h3>${car.carName}</h3>
+        <p>Price: $${car.price.amount}/day</p>
+        <p>Passengers: ${car.features.passengers}</p>
+        <p>Type: ${car.vehicleType}</p>
+    `;
+            return carItem;
+        }
+
+        function renderCars(cars) {
+            itemContainer.innerHTML = '';
+            cars.forEach((car, index) => {
+                itemContainer.appendChild(createCarCard(car, index));
+            });
+            addClickListeners();
+        }
+
+        function addClickListeners() {
+            const items = document.querySelectorAll('.item');
+            items.forEach(item => {
+                item.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    const index = parseInt(this.dataset.index, 10);
+                    const car = carData[index];
+                    toggleAppendedBox(index, car);
+                });
+            });
+        }
+
+        function toggleAppendedBox(index, car) {
+            const existingBox = document.getElementById(`appended-box-${index}`);
+            if (existingBox) {
+                existingBox.remove();
+                return;
+            }
+
+            const appendedBox = document.createElement('div');
+            appendedBox.id = `appended-box-${index}`;
+            appendedBox.classList.add('appended-box', 'show');
+            appendedBox.innerHTML = `
+        <h3>${car.carName}</h3>
+        <p>Price: $${car.price.amount}/day</p>
+        <p>Passengers: ${car.features.passengers}</p>
+        <p>Type: ${car.vehicleType}</p>
+        <p>Gearshift: ${car.features.shift}</p>
+        <button class="close">Close</button>
+    `;
+            const item = document.querySelector(`.item[data-index="${index}"]`);
+            item.after(appendedBox);
+
+            appendedBox.querySelector('.close').addEventListener('click', () => {
+                appendedBox.remove();
+            });
+        }
+
+        const dropdownMenus = document.querySelectorAll(".select-menu");
+
+        dropdownMenus.forEach((optionMenu, index) => {
+            const selectBtn = optionMenu.querySelector(".select-btn"),
+                options = optionMenu.querySelectorAll(".option"),
+                sBtn_text = optionMenu.querySelector(".sBtn-text");
+
+            let selectedCount = 0;
+
+            selectBtn.addEventListener("click", (event) => {
+                event.stopPropagation();
+                dropdownMenus.forEach(menu => {
+                    if (menu !== optionMenu) {
+                        menu.classList.remove("active-drop");
+                    }
+                });
+                optionMenu.classList.toggle("active-drop");
+            });
+
+            options.forEach(option => {
+                option.addEventListener("click", () => {
+                    const isSelected = option.classList.toggle("selected");
+
+                    if (index === 0 || index === 3 || index === 4) { // Single select
+                        options.forEach(opt => opt.classList.remove("selected"));
+                        if (isSelected) option.classList.add("selected");
+                        selectedCount = isSelected ? 1 : 0;
+                        sBtn_text.innerText = index === 0
+                            ? `Sort by: ${option.innerText}`
+                            : index === 3
+                                ? `Passengers: ${option.innerText}`
+                                : `Driver's age: ${option.innerText}`;
+                    } else { // Multiple select
+                        selectedCount += isSelected ? 1 : -1;
+                        sBtn_text.innerText = index === 1
+                            ? `Vehicle type ${selectedCount > 0 ? `(${selectedCount})` : ''}`
+                            : `Gearshift ${selectedCount > 0 ? `(${selectedCount})` : ''}`;
+                    }
+                    selectBtn.classList.add("highlighted");
+                    optionMenu.classList.remove("active-drop");
+                    applyFilters();
+                });
+            });
+        });
+
+        document.addEventListener("click", () => {
+            dropdownMenus.forEach(menu => menu.classList.remove("active-drop"));
+        });
+
+        function applyFilters() {
+            const filters = {};
+            dropdownMenus.forEach(menu => {
+                const selectedOptions = menu.querySelectorAll('.option.selected');
+                const filterName = menu.querySelector('.sBtn-text').textContent.toLowerCase().replace(/:|\(\d+\)/g, '');
+
+                if (selectedOptions.length > 0) {
+                    const filterValues = Array.from(selectedOptions).map(option => option.textContent.toLowerCase());
+                    filters[filterName] = filterValues;
+                }
+            });
+
+            let filteredCars = [...carData];
+
+            for (const [key, value] of Object.entries(filters)) {
+                if (key === 'sort by') {
+                    if (value.includes('low')) {
+                        filteredCars.sort((a, b) => a.price.amount - b.price.amount);
+                    } else {
+                        filteredCars.sort((a, b) => b.price.amount - a.price.amount);
+                    }
+                } else if (key === 'vehicle type' || key === 'gearshift') {
+                    filteredCars = filteredCars.filter(car => value.some(v => car[key].toLowerCase().includes(v)));
+                } else if (key === 'passengers') {
+                    const minPassengers = Math.min(...value.map(v => parseInt(v.replace('+', ''))));
+                    filteredCars = filteredCars.filter(car => car.features.passengers >= minPassengers);
+                } else if (key === 'driver\'s age') {
+                    const minAge = Math.min(...value.map(v => parseInt(v.replace('+', ''))));
+                    // Add your driver's age filtering logic here if you have that data
+                }
+            }
+            renderCars(filteredCars);
+        }
+
+        renderCars(carData);
+
+    </script>
+
+</body>
+
+</html>
